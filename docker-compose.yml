@@ -14,12 +14,18 @@ services:
     networks:
       - wpnet
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-pmysecret" ]
+      interval: 8s
+      timeout: 25s
+      retries: 3
 
   wordpress:
     image: wordpress
     container_name: wordpress
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       - WORDPRESS_DB_HOST=mysql
       - WORDPRESS_DB_NAME=wpdb
